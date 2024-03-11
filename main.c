@@ -1,5 +1,13 @@
 #include "raylib.h"
 
+char game[6][6] = {"001X10",
+                   "111110",
+                   "X20111",
+                   "X201X1",
+                   "110111",
+                   "000000",
+                  };
+
 static inline int min(int a, int b) {
     return a < b ? a : b;
 }
@@ -74,6 +82,7 @@ int main(void) {
                 .r = 0xFF, .g = 0xDA, .b = 0x2E, .a = 255
             });
 
+#if 0
             for (int x=0; x<nb_cell; x++) {
                 for (int y=0; y<nb_cell; y++) {
                     DrawTexture(
@@ -84,19 +93,55 @@ int main(void) {
                     );
                 }
             }
+#else
+            for (int x=0; x<6; x++) {
+                for (int y=0; y<6; y++) {
+                    switch (game[x][y]) {
+                    default:
+                    case '0':
+                        DrawTexture(
+                            tile_texture,
+                            grid.x + grid.width/nb_cell * x,
+                            grid.y + grid.height/nb_cell * y,
+                            WHITE
+                        );
+                        break;
+                    case '1':
+                    case '2':
+                        DrawTexture(
+                            tile_hover_texture,
+                            grid.x + grid.width/nb_cell * x,
+                            grid.y + grid.height/nb_cell * y,
+                            WHITE
+                        );
+                        break;
+                    case 'X':
+                        DrawTexture(
+                            mine_texture,
+                            grid.x + grid.width/nb_cell * x,
+                            grid.y + grid.height/nb_cell * y,
+                            WHITE
+                        );
+                        break;
+                    }
+                }
+            }
+#endif
 
             int mouse_x = GetMouseX();
             int mouse_y = GetMouseY();
             int grid_x = (int) grid.x;
             int grid_y = (int) grid.y;
 
+            // boundary
             mouse_x = max(mouse_x, grid_x);
-            mouse_x = min(mouse_x, grid_x + grid.width - tile_texture.width);
+            mouse_x = min(mouse_x, grid_x + grid.width - (grid_len/nb_cell));
             mouse_y = max(mouse_y, grid_y);
-            mouse_y = min(mouse_y, grid_y + grid.height - tile_texture.height);
+            mouse_y = min(mouse_y, grid_y + grid.height - (grid_len/nb_cell));
 
-            mouse_x -= (mouse_x - grid_x) % tile_texture.width;
-            mouse_y -= (mouse_y - grid_y) % tile_texture.height;
+            // remove extra
+            mouse_x -= (mouse_x - grid_x) % (grid_len/nb_cell);
+            mouse_y -= (mouse_y - grid_y) % (grid_len/nb_cell);
 
             if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
                 DrawTexture(mine_texture, mouse_x, mouse_y, WHITE);
