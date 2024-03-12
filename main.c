@@ -207,7 +207,7 @@ int main(void)
     srand(time(NULL));
 
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
-    SetTraceLogLevel(LOG_ERROR);
+    // SetTraceLogLevel(LOG_ERROR);
 
     menu = (Rectangle){0, 0, screen_width, screen_height - screen_width};
     tile_image_orig = LoadImage("ressources/tile.png");
@@ -236,7 +236,10 @@ int main(void)
 
         BeginDrawing();
         {
-            ClearBackground(BLACK);
+            ClearBackground((Color) {
+                .r = 0x8E, .g = 0x8E, .b = 0x8E, .a = 255
+            });
+
 
             if (IsKeyPressed(KEY_S)) {
                 TakeScreenshot("minesweeper-screenshot.png");
@@ -285,7 +288,7 @@ int main(void)
 
             DrawRectangleRec(menu, menu_color);
             DrawRectangleRec(grid, (Color) {
-                .r = 255, .g = 240, .b = 172, .a = 255
+                .r = 0xC6, .g = 0xC6, .b = 0xC6, .a = 255
             });
 
             for (int x=0; x<game_size.x; x++) {
