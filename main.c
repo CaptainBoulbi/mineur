@@ -15,6 +15,7 @@ static inline int max(int a, int b) {
 }
 
 char game[16][30] = {0};
+char discover[16][30] = {0};
 
 typedef enum GameType {
     BEGINNER,
@@ -108,6 +109,7 @@ int count_bomb(int x, int y)
 void fill_game(GameType type)
 {
     memset(game, 0, 16*30);
+    memset(discover, 0, 16*30);
 
     switch (type) {
     case BEGINNER:
@@ -203,18 +205,22 @@ int main(void)
             for (int x=0; x<game_size.x; x++) {
                 for (int y=0; y<game_size.y; y++) {
                     Texture *tex;
-                    switch (game[y][x]) {
-                    default:
-                    case 'X': tex = &mine_texture; break;
-                    case '0': tex = &tile_texture; break;
-                    case '1': tex = &t1_texture; break;
-                    case '2': tex = &t2_texture; break;
-                    case '3': tex = &t3_texture; break;
-                    case '4': tex = &t4_texture; break;
-                    case '5': tex = &t5_texture; break;
-                    case '6': tex = &t6_texture; break;
-                    case '7': tex = &t7_texture; break;
-                    case '8': tex = &t8_texture; break;
+                    if (discover[y][x]) {
+                        switch (game[y][x]) {
+                            default:
+                            case 'X': tex = &mine_texture; break;
+                            case '0': continue;
+                            case '1': tex = &t1_texture; break;
+                            case '2': tex = &t2_texture; break;
+                            case '3': tex = &t3_texture; break;
+                            case '4': tex = &t4_texture; break;
+                            case '5': tex = &t5_texture; break;
+                            case '6': tex = &t6_texture; break;
+                            case '7': tex = &t7_texture; break;
+                            case '8': tex = &t8_texture; break;
+                        }
+                    } else {
+                        tex = &tile_texture;
                     }
 
                     DrawTexture(
@@ -237,14 +243,11 @@ int main(void)
             mouse_y = max(mouse_y, grid_y);
             mouse_y = min(mouse_y, grid_y + grid.height - (grid_len/game_size.y));
 
-            // remove extra
-            mouse_x -= (mouse_x - grid_x) % (grid_len/game_size.x);
-            mouse_y -= (mouse_y - grid_y) % (grid_len/game_size.y);
+            mouse_x = ((float) (mouse_x - grid_x) / grid_len) * game_size.x;
+            mouse_y = ((float) (mouse_y - grid_y) / grid_len) * game_size.y;
 
             if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
-                DrawTexture(mine_texture, mouse_x, mouse_y, WHITE);
-            } else {
-                DrawTexture(tile_hover_texture, mouse_x, mouse_y, WHITE);
+                discover[mouse_y][mouse_x] = 1;
             }
         }
         EndDrawing();
