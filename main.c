@@ -25,6 +25,7 @@ GameState game_state = PLAYING;
 int game_cap = 16*30;
 char game[16][30] = {0};
 char discover[16][30] = {0};
+char zero[16][30] = {0};
 
 typedef enum GameType {
     BEGINNER,
@@ -119,10 +120,6 @@ int count_bomb(int x, int y)
 
 void fill_game(void)
 {
-    game_state = PLAYING;
-    memset(game, 0, game_cap);
-    memset(discover, 0, game_cap);
-
     switch (current_game_type) {
     case BEGINNER:
         game_size.x = 9;
@@ -158,6 +155,49 @@ void fill_game(void)
 
             int count = count_bomb(x, y);
             game[y][x] = count + 48;
+        }
+    }
+}
+
+void discover_empty_cell(int x, int y)
+{
+    int count = 0;
+    for (int i=-1; i<=1; i++) {
+        if (x+i < 0 || x+i > game_size.x)
+            continue;
+        for (int j=-1; j<=1; j++) {
+            if (y+j < 0 || y+j > game_size.y)
+                continue;
+            if (game[y+j][x+i] == '0' && discover[y+j][x+i])
+                count++;
+        }
+    }
+    if (count > 0)
+        discover[y][x] = 1;
+}
+
+void zero_click(int x, int y)
+{
+    if (x < 0 || x >= game_size.x ||
+        y < 0 || y >= game_size.y)
+        return;
+
+    if (zero[y][x])
+        return;
+
+    discover[y][x] = 1;
+    zero[y][x] = 1;
+
+    if (game[y][x] != '0')
+        return;
+
+    for (int i=-1; i<=1; i++) {
+        if (x+i < 0 || x+i >= game_size.x)
+            continue;
+        for (int j=-1; j<=1; j++) {
+            if (y+j < 0 || y+j >= game_size.y)
+                continue;
+            zero_click(x+i, y+j);
         }
     }
 }
@@ -199,7 +239,12 @@ int main(void)
             ClearBackground(BLACK);
 
             if (IsKeyPressed(KEY_R)) {
+                game_state = PLAYING;
+                memset(game, 0, game_cap);
+                memset(discover, 0, game_cap);
+                memset(zero, 0, game_cap);
                 fill_game();
+
             }
             if (IsKeyPressed(KEY_P)) {
                 for (int x=0; x<game_size.x; x++) {
@@ -274,6 +319,8 @@ int main(void)
 
             if (game_state == PLAYING && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
                 discover[mouse_y][mouse_x] = 1;
+
+                zero_click(mouse_x, mouse_y);
 
                 int count_undiscovered_cell = 0;
                 for (int x=0; x<game_size.x; x++) {
