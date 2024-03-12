@@ -14,6 +14,15 @@ static inline int max(int a, int b) {
     return a > b ? a : b;
 }
 
+typedef enum GameState {
+    PLAYING,
+    WIN,
+    LOSE,
+} GameState;
+
+GameState game_state = PLAYING;
+
+int game_cap = 16*30;
 char game[16][30] = {0};
 char discover[16][30] = {0};
 
@@ -108,8 +117,9 @@ int count_bomb(int x, int y)
 
 void fill_game(GameType type)
 {
-    memset(game, 0, 16*30);
-    memset(discover, 0, 16*30);
+    game_state = PLAYING;
+    memset(game, 0, game_cap);
+    memset(discover, 0, game_cap);
 
     switch (type) {
     case BEGINNER:
@@ -197,7 +207,20 @@ int main(void)
                 }
             }
 
-            DrawRectangleRec(menu, RED);
+            Color menu_color;
+            switch (game_state) {
+            case LOSE:
+                menu_color = RED;
+                break;
+            case WIN:
+                menu_color = GREEN;
+                break;
+            case PLAYING:
+                menu_color = YELLOW;
+                break;
+            }
+
+            DrawRectangleRec(menu, menu_color);
             DrawRectangleRec(grid, (Color) {
                 .r = 255, .g = 240, .b = 172, .a = 255
             });
@@ -246,8 +269,24 @@ int main(void)
             mouse_x = ((float) (mouse_x - grid_x) / grid_len) * game_size.x;
             mouse_y = ((float) (mouse_y - grid_y) / grid_len) * game_size.y;
 
-            if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
+            if (game_state == PLAYING && IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
                 discover[mouse_y][mouse_x] = 1;
+
+                int count_undiscovered_cell = 0;
+                for (int x=0; x<game_size.x; x++) {
+                    for (int y=0; y<game_size.y; y++) {
+                        if (!discover[y][x])
+                            count_undiscovered_cell++;
+                    }
+                }
+
+                if (game_state != LOSE && count_undiscovered_cell <= nb_bomb)
+                    game_state = WIN;
+
+                if (game[mouse_y][mouse_x] == 'X') {
+                    memset(discover, 1, game_cap);
+                    game_state = LOSE;
+                }
             }
         }
         EndDrawing();
