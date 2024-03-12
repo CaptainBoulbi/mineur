@@ -33,7 +33,7 @@ typedef enum GameType {
     EXPERT,
 } GameType;
 
-GameType current_game_type = BEGINNER;
+GameType current_game_type = INTERMEDIATE;
 
 typedef struct Vec2i {
     int x;
@@ -246,14 +246,6 @@ int main(void)
                 fill_game();
 
             }
-            if (IsKeyPressed(KEY_P)) {
-                for (int x=0; x<game_size.x; x++) {
-                    for (int y=0; y<game_size.y; y++) {
-                        printf("%c", game[y][x]);
-                    }
-                    printf("\n");
-                }
-            }
 
             Color menu_color;
             switch (game_state) {
@@ -308,16 +300,20 @@ int main(void)
             int grid_x = (int) grid.x;
             int grid_y = (int) grid.y;
 
-            // boundary
             mouse_x = max(mouse_x, grid_x);
-            mouse_x = min(mouse_x, grid_x + grid.width - (grid_len/game_size.x));
+            mouse_x = min(mouse_x, grid_x + grid.width -
+                    (grid_len/game_size.x));
+
             mouse_y = max(mouse_y, grid_y);
-            mouse_y = min(mouse_y, grid_y + grid.height - (grid_len/game_size.y));
+            mouse_y = min(mouse_y, grid_y + grid.height -
+                    (grid_len/game_size.y));
 
             mouse_x = ((float) (mouse_x - grid_x) / grid_len) * game_size.x;
             mouse_y = ((float) (mouse_y - grid_y) / grid_len) * game_size.y;
 
-            if (game_state == PLAYING && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+            if (game_state == PLAYING &&
+                IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+            {
                 discover[mouse_y][mouse_x] = 1;
 
                 zero_click(mouse_x, mouse_y);
