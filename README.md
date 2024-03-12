@@ -6,7 +6,9 @@ Oh no, my os doesn't comme with minesweeper preinstalled, let's make it myself.
 
 # Keybind
 
-- q / escape : close app
+- q (for azerty) : close app
+- a (for qwerty) : close app
+- escape         : close app
 - r : reset grid
 - b : switch to beginner difficulty
 - i : switch to intermediate difficulty
