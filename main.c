@@ -32,6 +32,8 @@ typedef enum GameType {
     EXPERT,
 } GameType;
 
+GameType current_game_type = BEGINNER;
+
 typedef struct Vec2i {
     int x;
     int y;
@@ -115,13 +117,13 @@ int count_bomb(int x, int y)
     return count;
 }
 
-void fill_game(GameType type)
+void fill_game(void)
 {
     game_state = PLAYING;
     memset(game, 0, game_cap);
     memset(discover, 0, game_cap);
 
-    switch (type) {
+    switch (current_game_type) {
     case BEGINNER:
         game_size.x = 9;
         game_size.y = 9;
@@ -165,6 +167,7 @@ int main(void)
     srand(time(NULL));
 
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
+    SetTraceLogLevel(LOG_ERROR);
 
     menu = (Rectangle){0, 0, screen_width, screen_height - screen_width};
     tile_image_orig = LoadImage("ressources/tile.png");
@@ -185,7 +188,7 @@ int main(void)
 
     screen_resize_handle();
 
-    fill_game(BEGINNER);
+    fill_game();
 
     while (!WindowShouldClose()) {
         if (IsWindowResized())
@@ -196,7 +199,7 @@ int main(void)
             ClearBackground(BLACK);
 
             if (IsKeyPressed(KEY_R)) {
-                fill_game(BEGINNER);
+                fill_game();
             }
             if (IsKeyPressed(KEY_P)) {
                 for (int x=0; x<game_size.x; x++) {
@@ -269,7 +272,7 @@ int main(void)
             mouse_x = ((float) (mouse_x - grid_x) / grid_len) * game_size.x;
             mouse_y = ((float) (mouse_y - grid_y) / grid_len) * game_size.y;
 
-            if (game_state == PLAYING && IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
+            if (game_state == PLAYING && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
                 discover[mouse_y][mouse_x] = 1;
 
                 int count_undiscovered_cell = 0;
