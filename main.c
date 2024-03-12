@@ -238,13 +238,36 @@ int main(void)
         {
             ClearBackground(BLACK);
 
-            if (IsKeyPressed(KEY_R)) {
+            if (IsKeyPressed(KEY_S)) {
+                TakeScreenshot("minesweeper-screenshot.png");
+            }
+
+            if (IsKeyPressed(KEY_A)) {
+                CloseWindow();
+                exit(0);
+            }
+
+            int resize = 0;
+            if (IsKeyPressed(KEY_I)) {
+                current_game_type = INTERMEDIATE;
+                resize = 1;
+            }
+            if (IsKeyPressed(KEY_B)) {
+                current_game_type = BEGINNER;
+                resize = 1;
+            }
+            if (IsKeyPressed(KEY_E)) {
+                current_game_type = EXPERT;
+                resize = 1;
+            }
+            if (resize || IsKeyPressed(KEY_R)) {
                 game_state = PLAYING;
                 memset(game, 0, game_cap);
                 memset(discover, 0, game_cap);
                 memset(zero, 0, game_cap);
                 fill_game();
-
+                screen_resize_handle();
+                resize = 0;
             }
 
             Color menu_color;
