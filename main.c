@@ -373,6 +373,19 @@ int main(void)
                 .r = 0xC6, .g = 0xC6, .b = 0xC6, .a = 255
             });
 
+            int timer_pad = 10;
+            int timer_mid = (screen_width * 3) / 4;
+            DrawTexture(
+                fixed_tile_texture, // TODO: double_fixed_tile_texture
+                timer_mid - timer_pad - fixed_tile_texture.width, 0,
+                WHITE
+            );
+            DrawTexture(
+                fixed_tile_texture, // TODO: double_fixed_tile_texture
+                timer_mid + timer_pad, 0,
+                WHITE
+            );
+
             for (int x=0; x<game_size.x; x++) {
                 for (int y=0; y<game_size.y; y++) {
                     Texture *tex;
