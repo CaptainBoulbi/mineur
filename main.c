@@ -214,6 +214,23 @@ void zero_click(int x, int y)
     }
 }
 
+int collision(Rectangle rec, int x, int y)
+{
+    return
+        x > rec.x && x < rec.x + rec.width &&
+        y > rec.y && y < rec.y + rec.height;
+}
+
+void reload_game(void)
+{
+    game_state = PLAYING;
+    memset(game, 0, game_cap);
+    memset(discover, 0, game_cap);
+    memset(zero, 0, game_cap);
+    fill_game();
+    screen_resize_handle();
+}
+
 int main(void)
 {
     srand(time(NULL));
@@ -282,12 +299,7 @@ int main(void)
                 resize = 1;
             }
             if (resize || IsKeyPressed(KEY_R)) {
-                game_state = PLAYING;
-                memset(game, 0, game_cap);
-                memset(discover, 0, game_cap);
-                memset(zero, 0, game_cap);
-                fill_game();
-                screen_resize_handle();
+                reload_game();
                 resize = 0;
             }
 
@@ -309,12 +321,9 @@ int main(void)
             }
 
             DrawRectangleRec(menu, menu_color);
-            DrawTexture(
-                *menu_smiley,
-                menu.width/2 - menu_smiley->width/2,
-                0,
-                WHITE
-            );
+
+            Vec2i smiley_coord = {menu.width/2 - menu_smiley->width/2, 0};
+            DrawTexture( *menu_smiley, smiley_coord.x, smiley_coord.y, WHITE);
             DrawTexture(
                 camera_texture,
                 menu.width/2 - menu_smiley->width/2 - camera_texture.width -10,
@@ -368,21 +377,25 @@ int main(void)
             int mouse_y = GetMouseY();
             int grid_x = (int) grid.x;
             int grid_y = (int) grid.y;
+            int mouse_in_grid = 0;
+            int mouse_in_menu = 0;
 
-            mouse_x = max(mouse_x, grid_x);
-            mouse_x = min(mouse_x, grid_x + grid.width -
-                    (grid_len/game_size.x));
+            if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+                if (grid_x < mouse_x && mouse_x < grid_x + grid.width &&
+                    grid_y < mouse_y && mouse_y < grid_y + grid.height)
+                {
+                    mouse_in_grid = 1;
+                } else if (0 < mouse_x && mouse_x < menu.width &&
+                           0 < mouse_y && mouse_y < menu.height)
+                {
+                    mouse_in_menu = 1;
+                }
+            }
 
-            mouse_y = max(mouse_y, grid_y);
-            mouse_y = min(mouse_y, grid_y + grid.height -
-                    (grid_len/game_size.y));
+            if (mouse_in_grid && game_state == PLAYING) {
+                mouse_x = ((float)(mouse_x - grid_x) / grid_len) * game_size.x;
+                mouse_y = ((float)(mouse_y - grid_y) / grid_len) * game_size.y;
 
-            mouse_x = ((float) (mouse_x - grid_x) / grid_len) * game_size.x;
-            mouse_y = ((float) (mouse_y - grid_y) / grid_len) * game_size.y;
-
-            if (game_state == PLAYING &&
-                IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
-            {
                 discover[mouse_y][mouse_x] = 1;
 
                 zero_click(mouse_x, mouse_y);
@@ -401,6 +414,16 @@ int main(void)
                 if (game[mouse_y][mouse_x] == 'X') {
                     memset(discover, 1, game_cap);
                     game_state = LOSE;
+                }
+            } else if (mouse_in_menu) {
+                if (collision(
+                        (Rectangle){
+                            smiley_coord.x, smiley_coord.y,
+                            playing_texture.width, playing_texture.height
+                        }, mouse_x, mouse_y)
+                   )
+                {
+                    reload_game();
                 }
             }
         }
