@@ -271,9 +271,15 @@ int main(void)
 
     fill_game();
 
+    int take_screenshot = 0;
     while (!WindowShouldClose()) {
         if (IsWindowResized())
             screen_resize_handle();
+
+        if (take_screenshot) {
+            TakeScreenshot("minesweeper-screenshot.png");
+            take_screenshot = 0;
+        }
 
         BeginDrawing();
         {
@@ -282,13 +288,13 @@ int main(void)
             });
 
 
-            if (IsKeyPressed(KEY_S)) {
-                TakeScreenshot("minesweeper-screenshot.png");
-            }
-
             if (IsKeyPressed(KEY_A)) {
                 CloseWindow();
                 exit(0);
+            }
+
+            if (IsKeyPressed(KEY_S)) {
+                take_screenshot = 1;
             }
 
             int resize = 0;
@@ -467,7 +473,7 @@ int main(void)
                 if (collision(camera_coord, camera_texture,
                               mouse_x, mouse_y))
                 {
-                    TakeScreenshot("minesweeper-screenshot.png");
+                    take_screenshot = 1;
                 }
                 if (collision(diff_button[0], fixed_tile_texture,
                               mouse_x, mouse_y))

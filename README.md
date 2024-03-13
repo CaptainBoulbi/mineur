@@ -13,7 +13,7 @@ Oh no, my os doesn't comme with minesweeper preinstalled, let's make it myself.
 - b : switch to beginner difficulty
 - i : switch to intermediate difficulty
 - e : switch to expert difficulty
-- s : take a screenshot (not working everywhere, not sure why)
+- s : take a screenshot
 
 # building
 
