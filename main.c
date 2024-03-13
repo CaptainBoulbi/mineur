@@ -42,6 +42,7 @@ typedef struct Vec2i {
 
 Vec2i game_size;
 int nb_bomb;
+char *nb_bomb_text;
 
 int screen_width = 500;
 int screen_height = 550;
@@ -66,6 +67,14 @@ INIT_TEXTURE(t5_image_orig, t5_texture);
 INIT_TEXTURE(t6_image_orig, t6_texture);
 INIT_TEXTURE(t7_image_orig, t7_texture);
 INIT_TEXTURE(t8_image_orig, t8_texture);
+
+Texture camera_texture;
+Texture lose_texture;
+Texture win_texture;
+Texture playing_texture;
+Texture fixed_tile_texture;
+Texture double_tile_texture;
+Texture triple_tile_texture;
 
 void screen_resize_handle(void)
 {
@@ -125,16 +134,19 @@ void fill_game(void)
         game_size.x = 9;
         game_size.y = 9;
         nb_bomb = 10;
+        nb_bomb_text = "10";
         break;
     case INTERMEDIATE:
         game_size.x = 16;
         game_size.y = 16;
         nb_bomb = 40;
+        nb_bomb_text = "40";
         break;
     case EXPERT:
         game_size.x = 16;
         game_size.y = 30;
         nb_bomb = 99;
+        nb_bomb_text = "99";
         break;
     }
 
@@ -209,6 +221,9 @@ int main(void)
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     // SetTraceLogLevel(LOG_ERROR);
 
+    InitWindow(screen_width, screen_height, "mineur");
+    SetTargetFPS(60);
+
     menu = (Rectangle){0, 0, screen_width, screen_height - screen_width};
     tile_image_orig = LoadImage("ressources/tile.png");
     tile_hover_image_orig = LoadImage("ressources/tile_hover.png");
@@ -223,8 +238,11 @@ int main(void)
     t7_image_orig = LoadImage("ressources/7.png");
     t8_image_orig = LoadImage("ressources/8.png");
 
-    InitWindow(screen_width, screen_height, "mineur");
-    SetTargetFPS(60);
+    camera_texture = LoadTexture("ressources/camera.png");
+    lose_texture = LoadTexture("ressources/lose.png");
+    win_texture = LoadTexture("ressources/win.png");
+    playing_texture = LoadTexture("ressources/playing.png");
+    fixed_tile_texture = LoadTexture("ressources/fixed_tile.png");
 
     screen_resize_handle();
 
@@ -274,19 +292,44 @@ int main(void)
             }
 
             Color menu_color;
+            Texture *menu_smiley;
             switch (game_state) {
             case LOSE:
                 menu_color = RED;
+                menu_smiley = &lose_texture;
                 break;
             case WIN:
                 menu_color = GREEN;
+                menu_smiley = &win_texture;
                 break;
             case PLAYING:
                 menu_color = YELLOW;
+                menu_smiley = &playing_texture;
                 break;
             }
 
             DrawRectangleRec(menu, menu_color);
+            DrawTexture(
+                *menu_smiley,
+                menu.width/2 - menu_smiley->width/2,
+                0,
+                WHITE
+            );
+            DrawTexture(
+                camera_texture,
+                menu.width/2 - menu_smiley->width/2 - camera_texture.width -10,
+                menu.height/2 - camera_texture.height/2,
+                WHITE
+            );
+            DrawTexture(
+                fixed_tile_texture,
+                menu.width - fixed_tile_texture.width,
+                0,
+                WHITE
+            );
+            DrawText(nb_bomb_text,
+                menu.width - fixed_tile_texture.width + 9, 13, 30, RED);
+
             DrawRectangleRec(grid, (Color) {
                 .r = 0xC6, .g = 0xC6, .b = 0xC6, .a = 255
             });
