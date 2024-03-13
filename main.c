@@ -33,7 +33,7 @@ typedef enum GameType {
     EXPERT,
 } GameType;
 
-GameType current_game_type = INTERMEDIATE;
+GameType current_game_type = BEGINNER;
 
 typedef struct Vec2i {
     int x;
@@ -42,6 +42,7 @@ typedef struct Vec2i {
 
 Vec2i game_size;
 int nb_bomb;
+int nb_bomb_pad = 9;
 char *nb_bomb_text;
 
 int screen_width = 500;
@@ -51,6 +52,8 @@ Rectangle menu;
 int grid_len = 0;
 
 Rectangle grid = {0};
+
+const Color text_color = RED;
 
 #define INIT_TEXTURE(img, tex) \
     Image img = {0}; \
@@ -134,18 +137,21 @@ void fill_game(void)
         game_size.x = 9;
         game_size.y = 9;
         nb_bomb = 10;
+        nb_bomb_pad = 13;
         nb_bomb_text = "10";
         break;
     case INTERMEDIATE:
         game_size.x = 16;
         game_size.y = 16;
         nb_bomb = 40;
+        nb_bomb_pad = 9;
         nb_bomb_text = "40";
         break;
     case EXPERT:
         game_size.x = 16;
         game_size.y = 30;
         nb_bomb = 99;
+        nb_bomb_pad = 9;
         nb_bomb_text = "99";
         break;
     }
@@ -214,11 +220,11 @@ void zero_click(int x, int y)
     }
 }
 
-int collision(Rectangle rec, int x, int y)
+int collision(Vec2i coord, Texture text, int x, int y)
 {
     return
-        x > rec.x && x < rec.x + rec.width &&
-        y > rec.y && y < rec.y + rec.height;
+        x > coord.x && x < coord.x + text.width &&
+        y > coord.y && y < coord.y + text.height;
 }
 
 void reload_game(void)
@@ -324,10 +330,14 @@ int main(void)
 
             Vec2i smiley_coord = {menu.width/2 - menu_smiley->width/2, 0};
             DrawTexture( *menu_smiley, smiley_coord.x, smiley_coord.y, WHITE);
-            DrawTexture(
-                camera_texture,
+
+            Vec2i camera_coord = {
                 menu.width/2 - menu_smiley->width/2 - camera_texture.width -10,
                 menu.height/2 - camera_texture.height/2,
+            };
+            DrawTexture(
+                camera_texture,
+                camera_coord.x, camera_coord.y,
                 WHITE
             );
             DrawTexture(
@@ -337,7 +347,27 @@ int main(void)
                 WHITE
             );
             DrawText(nb_bomb_text,
-                menu.width - fixed_tile_texture.width + 9, 13, 30, RED);
+                menu.width - fixed_tile_texture.width + nb_bomb_pad,
+                13, 30, text_color
+            );
+
+            int diff_pad = 10;
+            Vec2i diff_button[3] = {0};
+            char *diff_name[3] = {"BEGINNER", "INTERMEDIATE", "EXPERT"};
+            for (int i=0; i<3; i++) {
+                diff_button[i] = (Vec2i) {
+                    fixed_tile_texture.width*i + diff_pad*i, 0
+                };
+                DrawTexture(
+                    fixed_tile_texture, // TODO: double_fixed_tile_texture
+                    diff_button[i].x, diff_button[i].y,
+                    WHITE
+                );
+                DrawText(diff_name[i],
+                    diff_button[i].x + 9, diff_button[i].y + 15,
+                    20, text_color
+                );
+            }
 
             DrawRectangleRec(grid, (Color) {
                 .r = 0xC6, .g = 0xC6, .b = 0xC6, .a = 255
@@ -366,7 +396,7 @@ int main(void)
 
                     DrawTexture(
                         *tex,
-                        grid.x + grid.width/ game_size.x * x,
+                        grid.x + grid.width/game_size.x * x,
                         grid.y + grid.height/game_size.y * y,
                         WHITE
                     );
@@ -416,13 +446,32 @@ int main(void)
                     game_state = LOSE;
                 }
             } else if (mouse_in_menu) {
-                if (collision(
-                        (Rectangle){
-                            smiley_coord.x, smiley_coord.y,
-                            playing_texture.width, playing_texture.height
-                        }, mouse_x, mouse_y)
-                   )
+                if (collision(smiley_coord, playing_texture,
+                              mouse_x, mouse_y))
                 {
+                    reload_game();
+                }
+                if (collision(camera_coord, camera_texture,
+                              mouse_x, mouse_y))
+                {
+                    TakeScreenshot("minesweeper-screenshot.png");
+                }
+                if (collision(diff_button[0], fixed_tile_texture,
+                              mouse_x, mouse_y))
+                {
+                    current_game_type = BEGINNER;
+                    reload_game();
+                }
+                if (collision(diff_button[1], fixed_tile_texture,
+                              mouse_x, mouse_y))
+                {
+                    current_game_type = INTERMEDIATE;
+                    reload_game();
+                }
+                if (collision(diff_button[2], fixed_tile_texture,
+                              mouse_x, mouse_y))
+                {
+                    current_game_type = EXPERT;
                     reload_game();
                 }
             }
