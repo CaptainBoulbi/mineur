@@ -31,7 +31,7 @@ char zero[16][30] = {0};
 
 // I confused myself with game type, mode and diff, but it all mean the same
 typedef enum GameType {
-    BEGINNER,
+    BEGINNER = 0,
     INTERMEDIATE,
     EXPERT,
     GAME_TYPE_NB,
