@@ -19,6 +19,7 @@ typedef enum GameState {
     PLAYING,
     WIN,
     LOSE,
+    RECORD,
 } GameState;
 
 GameState game_state = PLAYING;
@@ -80,6 +81,7 @@ INIT_TEXTURE(t8_image_orig, t8_texture);
 Texture camera_texture;
 Texture lose_texture;
 Texture win_texture;
+Texture record_texture;
 Texture playing_texture;
 Texture fixed_tile_texture;
 Texture double_tile_texture;
@@ -293,6 +295,7 @@ int main(void)
     camera_texture = LoadTexture("ressources/camera.png");
     lose_texture = LoadTexture("ressources/lose.png");
     win_texture = LoadTexture("ressources/win.png");
+    record_texture = LoadTexture("ressources/record.png");
     playing_texture = LoadTexture("ressources/playing.png");
     fixed_tile_texture = LoadTexture("ressources/fixed_tile.png");
     double_tile_texture = LoadTexture("ressources/tile_2.png");
@@ -361,6 +364,12 @@ int main(void)
                 menu_color = YELLOW;
                 menu_smiley = &playing_texture;
                 break;
+            case RECORD:
+                menu_color = BLUE;
+                menu_smiley = &record_texture;
+                break;
+            default:
+                assert(0 && "game mode not supported");
             }
 
             DrawRectangleRec(menu, menu_color);
@@ -482,7 +491,7 @@ int main(void)
                     game_state = LOSE;
                 }
             } else if (mouse_in_menu) {
-                if (collision(smiley_coord, playing_texture,
+                if (collision(smiley_coord, *menu_smiley,
                               mouse_x, mouse_y))
                 {
                     reload_game();
