@@ -34,6 +34,8 @@ typedef enum GameType {
 } GameType;
 
 GameType current_game_type = BEGINNER;
+char *current_game_name = "beginner";
+Color current_game_color = GREEN;
 
 typedef struct Vec2i {
     int x;
@@ -53,7 +55,8 @@ int grid_len = 0;
 
 Rectangle grid = {0};
 
-const Color text_color = RED;
+const Color text_color = BLACK;
+const Color hover_color = RED;
 
 #define INIT_TEXTURE(img, tex) \
     Image img = {0}; \
@@ -266,6 +269,8 @@ int main(void)
     win_texture = LoadTexture("ressources/win.png");
     playing_texture = LoadTexture("ressources/playing.png");
     fixed_tile_texture = LoadTexture("ressources/fixed_tile.png");
+    double_tile_texture = LoadTexture("ressources/tile_2.png");
+    triple_tile_texture = LoadTexture("ressources/tile_3.png");
 
     screen_resize_handle();
 
@@ -300,14 +305,20 @@ int main(void)
             int resize = 0;
             if (IsKeyPressed(KEY_I)) {
                 current_game_type = INTERMEDIATE;
+                current_game_name = "intermediate";
+                current_game_color = ORANGE;
                 resize = 1;
             }
             if (IsKeyPressed(KEY_B)) {
                 current_game_type = BEGINNER;
+                current_game_name = "beginner";
+                current_game_color = GREEN;
                 resize = 1;
             }
             if (IsKeyPressed(KEY_E)) {
                 current_game_type = EXPERT;
+                current_game_name = "expert";
+                current_game_color = RED;
                 resize = 1;
             }
             if (resize || IsKeyPressed(KEY_R)) {
@@ -357,23 +368,27 @@ int main(void)
                 13, 30, text_color
             );
 
-            int diff_pad = 10;
-            Vec2i diff_button[3] = {0};
-            char *diff_name[3] = {"BEGINNER", "INTERMEDIATE", "EXPERT"};
-            for (int i=0; i<3; i++) {
-                diff_button[i] = (Vec2i) {
-                    fixed_tile_texture.width*i + diff_pad*i, 0
-                };
-                DrawTexture(
-                    fixed_tile_texture, // TODO: double_fixed_tile_texture
-                    diff_button[i].x, diff_button[i].y,
-                    WHITE
-                );
-                DrawText(diff_name[i],
-                    diff_button[i].x + 9, diff_button[i].y + 15,
-                    20, text_color
-                );
-            }
+            // int diff_pad = 10;
+            // Vec2i diff_button[3] = {0};
+            // char *diff_name[3] = {"BEGINNER", "INTERMEDIATE", "EXPERT"};
+            // for (int i=0; i<3; i++) {
+            //     diff_button[i] = (Vec2i) {
+            //         triple_tile_texture.width*i + diff_pad*i, 0
+            //     };
+            //     DrawTexture(
+            //         triple_tile_texture, // TODO: double_fixed_tile_texture
+            //         diff_button[i].x, diff_button[i].y,
+            //         WHITE
+            //     );
+            //     DrawText(diff_name[i],
+            //         diff_button[i].x + 9, diff_button[i].y + 15,
+            //         20, text_color
+            //     );
+            // }
+
+            DrawTexture(triple_tile_texture, 0, 0, WHITE);
+            DrawText("mode :", 13, 5, 20, text_color);
+            DrawText(current_game_name, 13, 25, 20.0f, current_game_color);
 
             DrawRectangleRec(grid, (Color) {
                 .r = 0xC6, .g = 0xC6, .b = 0xC6, .a = 255
@@ -475,24 +490,24 @@ int main(void)
                 {
                     take_screenshot = 1;
                 }
-                if (collision(diff_button[0], fixed_tile_texture,
-                              mouse_x, mouse_y))
-                {
-                    current_game_type = BEGINNER;
-                    reload_game();
-                }
-                if (collision(diff_button[1], fixed_tile_texture,
-                              mouse_x, mouse_y))
-                {
-                    current_game_type = INTERMEDIATE;
-                    reload_game();
-                }
-                if (collision(diff_button[2], fixed_tile_texture,
-                              mouse_x, mouse_y))
-                {
-                    current_game_type = EXPERT;
-                    reload_game();
-                }
+                // if (collision(diff_button[0], triple_tile_texture,
+                //               mouse_x, mouse_y))
+                // {
+                //     current_game_type = BEGINNER;
+                //     reload_game();
+                // }
+                // if (collision(diff_button[1], triple_tile_texture,
+                //               mouse_x, mouse_y))
+                // {
+                //     current_game_type = INTERMEDIATE;
+                //     reload_game();
+                // }
+                // if (collision(diff_button[2], triple_tile_texture,
+                //               mouse_x, mouse_y))
+                // {
+                //     current_game_type = EXPERT;
+                //     reload_game();
+                // }
             }
         }
         EndDrawing();
