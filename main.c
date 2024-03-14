@@ -8,12 +8,15 @@
 
 #define ARRAT(arr, type, x, y) ((arr) + (y)*(type) + (x))
 
-static inline int min(int a, int b) {
-    return a < b ? a : b;
-}
-static inline int max(int a, int b) {
-    return a > b ? a : b;
-}
+#define min(a, b) ((a) < (b) ? (a) : (b))
+#define max(a, b) ((a) > (b) ? (a) : (b))
+
+// static inline int min(int a, int b) {
+//     return a < b ? a : b;
+// }
+// static inline int max(int a, int b) {
+//     return a > b ? a : b;
+// }
 
 typedef enum GameState {
     PLAYING,
@@ -24,12 +27,20 @@ typedef enum GameState {
 
 GameState game_state = PLAYING;
 
-int game_cap = 16*30;
+#if 1
+int game_cap = 30*16;
+char game[30][16] = {0};
+char discover[30][16] = {0};
+char zero[30][16] = {0};
+#else
+int game_cap = 30*16;
 char game[16][30] = {0};
 char discover[16][30] = {0};
 char zero[16][30] = {0};
+#endif
 
 // I confused myself with game type, mode and diff, but it all mean the same
+// TODO: refactor it
 typedef enum GameType {
     BEGINNER = 0,
     INTERMEDIATE,
@@ -55,7 +66,6 @@ int screen_width = 500;
 int screen_height = 550;
 
 Rectangle menu;
-int grid_len = 0;
 
 Rectangle grid = {0};
 
@@ -93,11 +103,17 @@ void screen_resize_handle(void)
     screen_height = GetScreenHeight();
 
     menu.width = screen_width;
-    grid_len = min(screen_width, screen_height - menu.height);
+
+    float width = screen_width / game_size.x;
+    float height = (screen_height - menu.height) / game_size.y;
+    float cell_len = min(width, height);
+
+    int grid_width = cell_len * game_size.x;
+    int grid_height = cell_len * game_size.y;
     grid = (Rectangle){
-        (screen_width - grid_len) / 2,
-        screen_height - grid_len,
-        grid_len, grid_len
+        (screen_width - grid_width) / 2,
+        screen_height - grid_height,
+        grid_width, grid_height
     };
 
 #define RESIZE_TEXTURE(name, copy, orig) \
@@ -156,8 +172,8 @@ void fill_game(void)
         nb_bomb_text = "40";
         break;
     case EXPERT:
-        game_size.x = 16;
-        game_size.y = 30;
+        game_size.x = 30;
+        game_size.y = 16;
         nb_bomb = 99;
         nb_bomb_pad = 9;
         nb_bomb_text = "99";
@@ -303,9 +319,9 @@ int main(void)
     double_tile_texture = LoadTexture("ressources/tile_2.png");
     triple_tile_texture = LoadTexture("ressources/tile_3.png");
 
-    screen_resize_handle();
-
     fill_game();
+
+    screen_resize_handle();
 
     int take_screenshot = 0;
     while (!WindowShouldClose()) {
@@ -470,8 +486,8 @@ int main(void)
             }
 
             if (mouse_in_grid && game_state == PLAYING) {
-                mouse_x = ((float)(mouse_x - grid_x) / grid_len) * game_size.x;
-                mouse_y = ((float)(mouse_y - grid_y) / grid_len) * game_size.y;
+                mouse_x = ((float)(mouse_x - grid_x) / grid.width) * game_size.x;
+                mouse_y = ((float)(mouse_y - grid_y) / grid.height) * game_size.y;
 
                 discover[mouse_y][mouse_x] = 1;
 
