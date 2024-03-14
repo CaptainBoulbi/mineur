@@ -27,10 +27,12 @@ char game[16][30] = {0};
 char discover[16][30] = {0};
 char zero[16][30] = {0};
 
+// I confused myself with game type, mode and diff, but it all mean the same
 typedef enum GameType {
     BEGINNER,
     INTERMEDIATE,
     EXPERT,
+    GAME_TYPE_NB,
 } GameType;
 
 GameType current_game_type = BEGINNER;
@@ -240,6 +242,25 @@ void reload_game(void)
     screen_resize_handle();
 }
 
+void switch_mode(GameType gt)
+{
+    current_game_type = gt;
+    switch (gt) {
+    case BEGINNER:
+        current_game_name = "beginner";
+        current_game_color = GREEN;
+        break;
+    case INTERMEDIATE:
+        current_game_name = "intermediate";
+        current_game_color = ORANGE;
+        break;
+    case EXPERT:
+        current_game_name = "expert";
+        current_game_color = RED;
+        break;
+    }
+}
+
 int main(void)
 {
     srand(time(NULL));
@@ -304,21 +325,15 @@ int main(void)
 
             int resize = 0;
             if (IsKeyPressed(KEY_I)) {
-                current_game_type = INTERMEDIATE;
-                current_game_name = "intermediate";
-                current_game_color = ORANGE;
+                switch_mode(INTERMEDIATE);
                 resize = 1;
             }
             if (IsKeyPressed(KEY_B)) {
-                current_game_type = BEGINNER;
-                current_game_name = "beginner";
-                current_game_color = GREEN;
+                switch_mode(BEGINNER);
                 resize = 1;
             }
             if (IsKeyPressed(KEY_E)) {
-                current_game_type = EXPERT;
-                current_game_name = "expert";
-                current_game_color = RED;
+                switch_mode(EXPERT);
                 resize = 1;
             }
             if (resize || IsKeyPressed(KEY_R)) {
@@ -489,6 +504,12 @@ int main(void)
                               mouse_x, mouse_y))
                 {
                     take_screenshot = 1;
+                }
+                if (collision((Vec2i) {0, 0}, triple_tile_texture,
+                              mouse_x, mouse_y))
+                {
+                    switch_mode((current_game_type + 1) % GAME_TYPE_NB);
+                    reload_game();
                 }
                 // if (collision(diff_button[0], triple_tile_texture,
                 //               mouse_x, mouse_y))
