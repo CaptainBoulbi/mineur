@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <assert.h>
 #include <time.h>
 
 #include "raylib.h"
@@ -159,6 +160,8 @@ void fill_game(void)
         nb_bomb_pad = 9;
         nb_bomb_text = "99";
         break;
+    default:
+        assert(0 && "game mode not supported");
     }
 
     for (int i=0; i<nb_bomb; i++) {
@@ -258,6 +261,8 @@ void switch_mode(GameType gt)
         current_game_name = "expert";
         current_game_color = RED;
         break;
+    default:
+        assert(0 && "game mode not supported");
     }
 }
 
@@ -383,24 +388,6 @@ int main(void)
                 13, 30, text_color
             );
 
-            // int diff_pad = 10;
-            // Vec2i diff_button[3] = {0};
-            // char *diff_name[3] = {"BEGINNER", "INTERMEDIATE", "EXPERT"};
-            // for (int i=0; i<3; i++) {
-            //     diff_button[i] = (Vec2i) {
-            //         triple_tile_texture.width*i + diff_pad*i, 0
-            //     };
-            //     DrawTexture(
-            //         triple_tile_texture, // TODO: double_fixed_tile_texture
-            //         diff_button[i].x, diff_button[i].y,
-            //         WHITE
-            //     );
-            //     DrawText(diff_name[i],
-            //         diff_button[i].x + 9, diff_button[i].y + 15,
-            //         20, text_color
-            //     );
-            // }
-
             DrawTexture(triple_tile_texture, 0, 0, WHITE);
             DrawText("mode :", 13, 5, 20, text_color);
             DrawText(current_game_name, 13, 25, 20.0f, current_game_color);
@@ -412,12 +399,12 @@ int main(void)
             int timer_pad = 10;
             int timer_mid = (screen_width * 3) / 4;
             DrawTexture(
-                fixed_tile_texture, // TODO: double_fixed_tile_texture
+                fixed_tile_texture,
                 timer_mid - timer_pad - fixed_tile_texture.width, 0,
                 WHITE
             );
             DrawTexture(
-                fixed_tile_texture, // TODO: double_fixed_tile_texture
+                fixed_tile_texture,
                 timer_mid + timer_pad, 0,
                 WHITE
             );
@@ -511,24 +498,6 @@ int main(void)
                     switch_mode((current_game_type + 1) % GAME_TYPE_NB);
                     reload_game();
                 }
-                // if (collision(diff_button[0], triple_tile_texture,
-                //               mouse_x, mouse_y))
-                // {
-                //     current_game_type = BEGINNER;
-                //     reload_game();
-                // }
-                // if (collision(diff_button[1], triple_tile_texture,
-                //               mouse_x, mouse_y))
-                // {
-                //     current_game_type = INTERMEDIATE;
-                //     reload_game();
-                // }
-                // if (collision(diff_button[2], triple_tile_texture,
-                //               mouse_x, mouse_y))
-                // {
-                //     current_game_type = EXPERT;
-                //     reload_game();
-                // }
             }
         }
         EndDrawing();
