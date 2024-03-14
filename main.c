@@ -273,7 +273,9 @@ int main(void)
     srand(time(NULL));
 
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
-    // SetTraceLogLevel(LOG_ERROR);
+#ifdef RELEASE
+    SetTraceLogLevel(LOG_ERROR);
+#endif // RELEASE
 
     InitWindow(screen_width, screen_height, "mineur");
     SetTargetFPS(60);
