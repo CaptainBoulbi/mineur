@@ -1,5 +1,5 @@
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <assert.h>
 #include <time.h>
@@ -59,6 +59,7 @@ const Color text_color = BLACK;
 const Color hover_color = RED;
 
 float timer = 0.0f;
+char timer_text[10] = {0};
 int need_to_fill = 1;
 
 #define INIT_TEXTURE(img, tex) \
@@ -178,13 +179,12 @@ void fill_game(int click_x, int click_y)
         int x = rand() % game_size.x;
         int y = rand() % game_size.y;
 
-        if (click_x == x && click_y == y)
-            continue;
-
-        if (game[y][x] == 'X')
+        if ((click_x == x && click_y == y) || game[y][x] == 'X') {
             i--;
-        else
-            game[y][x] = 'X';
+            continue;
+        }
+
+        game[y][x] = 'X';
     }
 
     for (int x=0; x<game_size.x; x++) {
@@ -241,6 +241,7 @@ void reload_game(void)
     need_to_fill = 1;
     screen_resize_handle();
     timer = 0.0f;
+    memset(timer_text, 0, sizeof(timer_text));
 }
 
 void switch_mode(GameType gt)
@@ -314,7 +315,10 @@ int main(void)
                 take_screenshot = 0;
             }
 
-            timer += GetFrameTime();
+            if (game_state == PLAYING) {
+                timer += GetFrameTime();
+                snprintf(timer_text, sizeof(timer_text), "%d", (int) timer);
+            }
 
             ClearBackground((Color) {
                 .r = 0x8E, .g = 0x8E, .b = 0x8E, .a = 255
@@ -410,10 +414,20 @@ int main(void)
                 timer_mid - timer_pad - double_tile_texture.width, 0,
                 WHITE
             );
+            DrawText(
+                timer_text,
+                timer_mid - timer_pad - double_tile_texture.width + 13, 10,
+                35.0f, text_color
+            );
             DrawTexture(
                 double_tile_texture,
                 timer_mid + timer_pad, 0,
                 WHITE
+            );
+            DrawText(
+                timer_text,
+                timer_mid + timer_pad + 13, 10,
+                35.0f, text_color
             );
 
             for (int y=0; y<game_size.y; y++) {
