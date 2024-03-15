@@ -58,6 +58,9 @@ Rectangle grid = {0};
 const Color text_color = BLACK;
 const Color hover_color = RED;
 
+float timer = 0.0f;
+int need_to_fill = 1;
+
 #define INIT_TEXTURE(img, tex) \
     Image img = {0}; \
     Texture tex = {0}
@@ -140,7 +143,7 @@ int count_bomb(int x, int y)
     return count;
 }
 
-void fill_game(void)
+void setup_game(void)
 {
     switch (current_game_type) {
     case BEGINNER:
@@ -167,10 +170,17 @@ void fill_game(void)
     default:
         assert(0 && "game mode not supported");
     }
+}
 
+void fill_game(int click_x, int click_y)
+{
+    setup_game();
     for (int i=0; i<nb_bomb; i++) {
         int x = rand() % game_size.x;
         int y = rand() % game_size.y;
+
+        if (click_x == x && click_y == y)
+            continue;
 
         if (game[y][x] == 'X')
             i--;
@@ -228,8 +238,9 @@ void reload_game(void)
     memset(game, 0, game_cap);
     memset(discover, 0, game_cap);
     memset(zero, 0, game_cap);
-    fill_game();
+    need_to_fill = 1;
     screen_resize_handle();
+    timer = 0.0f;
 }
 
 void switch_mode(GameType gt)
@@ -288,22 +299,23 @@ int main(void)
     double_tile_texture = LoadTexture("ressources/tile_2.png");
     triple_tile_texture = LoadTexture("ressources/tile_3.png");
 
-    fill_game();
-
+    setup_game();
     screen_resize_handle();
 
     int take_screenshot = 0;
     while (!WindowShouldClose()) {
-        if (IsWindowResized())
-            screen_resize_handle();
-
-        if (take_screenshot) {
-            TakeScreenshot("minesweeper-screenshot.png");
-            take_screenshot = 0;
-        }
-
         BeginDrawing();
         {
+            if (IsWindowResized())
+                screen_resize_handle();
+
+            if (take_screenshot) {
+                TakeScreenshot("minesweeper-screenshot.png");
+                take_screenshot = 0;
+            }
+
+            timer += GetFrameTime();
+
             ClearBackground((Color) {
                 .r = 0x8E, .g = 0x8E, .b = 0x8E, .a = 255
             });
@@ -394,12 +406,12 @@ int main(void)
             int timer_pad = 10;
             int timer_mid = (screen_width * 3) / 4;
             DrawTexture(
-                fixed_tile_texture,
-                timer_mid - timer_pad - fixed_tile_texture.width, 0,
+                double_tile_texture,
+                timer_mid - timer_pad - double_tile_texture.width, 0,
                 WHITE
             );
             DrawTexture(
-                fixed_tile_texture,
+                double_tile_texture,
                 timer_mid + timer_pad, 0,
                 WHITE
             );
@@ -439,7 +451,8 @@ int main(void)
             int mouse_in_grid = 0;
             int mouse_in_menu = 0;
 
-            if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+            int mouse_pressed = IsMouseButtonPressed(MOUSE_BUTTON_LEFT);
+            if (mouse_pressed) {
                 if (grid.x < mouse_x && mouse_x < grid.x + grid.width &&
                     grid.y < mouse_y && mouse_y < grid.y + grid.height)
                 {
@@ -451,10 +464,15 @@ int main(void)
                 }
             }
 
-            if (mouse_in_grid && game_state == PLAYING) {
-                mouse_x = ((mouse_x - grid.x) / grid.width) * game_size.x;
-                mouse_y = ((mouse_y - grid.y) / grid.height) * game_size.y;
+            mouse_x = ((mouse_x - grid.x) / grid.width) * game_size.x;
+            mouse_y = ((mouse_y - grid.y) / grid.height) * game_size.y;
 
+            if (need_to_fill && mouse_pressed) {
+                fill_game(mouse_x, mouse_y);
+                need_to_fill = 0;
+            }
+
+            if (mouse_in_grid && game_state == PLAYING) {
                 discover[mouse_y][mouse_x] = 1;
 
                 zero_click(mouse_x, mouse_y);
