@@ -20,10 +20,10 @@ typedef enum GameState {
 
 GameState game_state = PLAYING;
 
-int game_cap = 30*16;
-char game[30][16] = {0};
-char discover[30][16] = {0};
-char zero[30][16] = {0};
+int game_cap = 16*30;
+char game[16][30] = {0};
+char discover[16][30] = {0};
+char zero[16][30] = {0};
 
 // I confused myself with game type, mode and diff, but it all mean the same
 // TODO: refactor it
@@ -204,11 +204,11 @@ void zero_click(int x, int y)
     if (game[y][x] != '0')
         return;
 
-    for (int i=-1; i<=1; i++) {
-        if (x+i < 0 || x+i >= game_size.x)
+    for (int j=-1; j<=1; j++) {
+        if (y+j < 0 || y+j >= game_size.y)
             continue;
-        for (int j=-1; j<=1; j++) {
-            if (y+j < 0 || y+j >= game_size.y)
+        for (int i=-1; i<=1; i++) {
+            if (x+i < 0 || x+i >= game_size.x)
                 continue;
             zero_click(x+i, y+j);
         }
