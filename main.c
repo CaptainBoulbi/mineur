@@ -11,13 +11,6 @@
 #define min(a, b) ((a) < (b) ? (a) : (b))
 #define max(a, b) ((a) > (b) ? (a) : (b))
 
-// static inline int min(int a, int b) {
-//     return a < b ? a : b;
-// }
-// static inline int max(int a, int b) {
-//     return a > b ? a : b;
-// }
-
 typedef enum GameState {
     PLAYING,
     WIN,
@@ -140,10 +133,10 @@ int count_bomb(int x, int y)
 {
     int count = 0;
     for (int i=-1; i<=1; i++) {
-        if (x+i < 0 || x+i > game_size.x)
+        if (x+i < 0 || x+i >= game_size.x)
             continue;
         for (int j=-1; j<=1; j++) {
-            if (y+j < 0 || y+j > game_size.y)
+            if (y+j < 0 || y+j >= game_size.y)
                 continue;
             if (i == 0 && j == 0)
                 continue;
@@ -161,22 +154,22 @@ void fill_game(void)
         game_size.x = 9;
         game_size.y = 9;
         nb_bomb = 10;
-        nb_bomb_pad = 13;
         nb_bomb_text = "10";
+        nb_bomb_pad = 13;
         break;
     case INTERMEDIATE:
         game_size.x = 16;
         game_size.y = 16;
         nb_bomb = 40;
-        nb_bomb_pad = 9;
         nb_bomb_text = "40";
+        nb_bomb_pad = 9;
         break;
     case EXPERT:
         game_size.x = 30;
         game_size.y = 16;
         nb_bomb = 99;
-        nb_bomb_pad = 9;
         nb_bomb_text = "99";
+        nb_bomb_pad = 9;
         break;
     default:
         assert(0 && "game mode not supported");
@@ -207,10 +200,10 @@ void discover_empty_cell(int x, int y)
 {
     int count = 0;
     for (int i=-1; i<=1; i++) {
-        if (x+i < 0 || x+i > game_size.x)
+        if (x+i < 0 || x+i >= game_size.x)
             continue;
         for (int j=-1; j<=1; j++) {
-            if (y+j < 0 || y+j > game_size.y)
+            if (y+j < 0 || y+j >= game_size.y)
                 continue;
             if (game[y+j][x+i] == '0' && discover[y+j][x+i])
                 count++;
