@@ -174,7 +174,6 @@ void setup_game(void)
 
 void fill_game(int click_x, int click_y)
 {
-    setup_game();
     for (int i=0; i<nb_bomb; i++) {
         int x = rand() % game_size.x;
         int y = rand() % game_size.y;
@@ -234,6 +233,7 @@ int collision(Vec2i coord, Texture text, int x, int y)
 
 void reload_game(void)
 {
+    setup_game();
     game_state = PLAYING;
     memset(game, 0, game_cap);
     memset(discover, 0, game_cap);
