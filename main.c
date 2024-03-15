@@ -60,6 +60,11 @@ const Color hover_color = RED;
 
 float timer = 0.0f;
 char timer_text[10] = {0};
+char timer_record[GAME_TYPE_NB][10] = {
+    [BEGINNER] = "12",
+    [INTERMEDIATE] = "42",
+    [EXPERT] = "69"
+};
 int need_to_fill = 1;
 
 #define INIT_TEXTURE(img, tex) \
@@ -425,7 +430,7 @@ int main(void)
                 WHITE
             );
             DrawText(
-                timer_text,
+                timer_record[current_game_type],
                 timer_mid + timer_pad + 13, 10,
                 35.0f, text_color
             );
@@ -499,8 +504,12 @@ int main(void)
                     }
                 }
 
-                if (game_state != LOSE && count_undiscovered_cell <= nb_bomb)
-                    game_state = WIN;
+                if (game_state != LOSE && count_undiscovered_cell <= nb_bomb) {
+                    if (timer < atoi(timer_record[current_game_type]))
+                        game_state = RECORD;
+                    else
+                        game_state = WIN;
+                }
 
                 if (game[mouse_map_y][mouse_map_x] == 'X') {
                     memset(discover, 1, game_cap);
