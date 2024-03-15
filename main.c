@@ -20,17 +20,10 @@ typedef enum GameState {
 
 GameState game_state = PLAYING;
 
-#if 1
 int game_cap = 30*16;
 char game[30][16] = {0};
 char discover[30][16] = {0};
 char zero[30][16] = {0};
-#else
-int game_cap = 30*16;
-char game[16][30] = {0};
-char discover[16][30] = {0};
-char zero[16][30] = {0};
-#endif
 
 // I confused myself with game type, mode and diff, but it all mean the same
 // TODO: refactor it
@@ -136,7 +129,7 @@ int count_bomb(int x, int y)
         if (x+i < 0 || x+i >= game_size.x)
             continue;
         for (int j=-1; j<=1; j++) {
-            if (y+j < 0 || y+j >= game_size.y)
+            if (y+j < 0 || y+j > game_size.y)
                 continue;
             if (i == 0 && j == 0)
                 continue;
@@ -194,23 +187,6 @@ void fill_game(void)
             game[y][x] = count + 48;
         }
     }
-}
-
-void discover_empty_cell(int x, int y)
-{
-    int count = 0;
-    for (int i=-1; i<=1; i++) {
-        if (x+i < 0 || x+i >= game_size.x)
-            continue;
-        for (int j=-1; j<=1; j++) {
-            if (y+j < 0 || y+j >= game_size.y)
-                continue;
-            if (game[y+j][x+i] == '0' && discover[y+j][x+i])
-                count++;
-        }
-    }
-    if (count > 0)
-        discover[y][x] = 1;
 }
 
 void zero_click(int x, int y)
@@ -332,7 +308,6 @@ int main(void)
                 .r = 0x8E, .g = 0x8E, .b = 0x8E, .a = 255
             });
 
-
             if (IsKeyPressed(KEY_A)) {
                 CloseWindow();
                 exit(0);
@@ -429,8 +404,8 @@ int main(void)
                 WHITE
             );
 
-            for (int x=0; x<game_size.x; x++) {
-                for (int y=0; y<game_size.y; y++) {
+            for (int y=0; y<game_size.y; y++) {
+                for (int x=0; x<game_size.x; x++) {
                     Texture *tex;
                     if (discover[y][x]) {
                         switch (game[y][x]) {
@@ -461,14 +436,12 @@ int main(void)
 
             int mouse_x = GetMouseX();
             int mouse_y = GetMouseY();
-            int grid_x = (int) grid.x;
-            int grid_y = (int) grid.y;
             int mouse_in_grid = 0;
             int mouse_in_menu = 0;
 
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-                if (grid_x < mouse_x && mouse_x < grid_x + grid.width &&
-                    grid_y < mouse_y && mouse_y < grid_y + grid.height)
+                if (grid.x < mouse_x && mouse_x < grid.x + grid.width &&
+                    grid.y < mouse_y && mouse_y < grid.y + grid.height)
                 {
                     mouse_in_grid = 1;
                 } else if (0 < mouse_x && mouse_x < menu.width &&
@@ -479,8 +452,8 @@ int main(void)
             }
 
             if (mouse_in_grid && game_state == PLAYING) {
-                mouse_x = ((float)(mouse_x - grid_x) / grid.width) * game_size.x;
-                mouse_y = ((float)(mouse_y - grid_y) / grid.height) * game_size.y;
+                mouse_x = ((mouse_x - grid.x) / grid.width) * game_size.x;
+                mouse_y = ((mouse_y - grid.y) / grid.height) * game_size.y;
 
                 discover[mouse_y][mouse_x] = 1;
 
