@@ -271,7 +271,7 @@ int main(void)
 
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
 #ifdef RELEASE
-    SetTraceLogLevel(LOG_ERROR);
+    // SetTraceLogLevel(LOG_ERROR);
 #endif // RELEASE
 
     InitWindow(screen_width, screen_height, "mineur");
@@ -478,18 +478,18 @@ int main(void)
                 }
             }
 
-            mouse_x = ((mouse_x - grid.x) / grid.width) * game_size.x;
-            mouse_y = ((mouse_y - grid.y) / grid.height) * game_size.y;
+            int mouse_map_x = ((mouse_x - grid.x) / grid.width) * game_size.x;
+            int mouse_map_y = ((mouse_y - grid.y) / grid.height) * game_size.y;
 
             if (need_to_fill && mouse_pressed) {
-                fill_game(mouse_x, mouse_y);
+                fill_game(mouse_map_x, mouse_map_y);
                 need_to_fill = 0;
             }
 
             if (mouse_in_grid && game_state == PLAYING) {
-                discover[mouse_y][mouse_x] = 1;
+                discover[mouse_map_y][mouse_map_x] = 1;
 
-                zero_click(mouse_x, mouse_y);
+                zero_click(mouse_map_x, mouse_map_y);
 
                 int count_undiscovered_cell = 0;
                 for (int x=0; x<game_size.x; x++) {
@@ -502,7 +502,7 @@ int main(void)
                 if (game_state != LOSE && count_undiscovered_cell <= nb_bomb)
                     game_state = WIN;
 
-                if (game[mouse_y][mouse_x] == 'X') {
+                if (game[mouse_map_y][mouse_map_x] == 'X') {
                     memset(discover, 1, game_cap);
                     game_state = LOSE;
                 }
