@@ -276,7 +276,7 @@ int main(void)
 
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
 #ifdef RELEASE
-    // SetTraceLogLevel(LOG_ERROR);
+    SetTraceLogLevel(LOG_ERROR);
 #endif // RELEASE
 
     InitWindow(screen_width, screen_height, "mineur");
@@ -505,10 +505,12 @@ int main(void)
                 }
 
                 if (game_state != LOSE && count_undiscovered_cell <= nb_bomb) {
-                    if (timer < atoi(timer_record[current_game_type]))
+                    if (timer < atoi(timer_record[current_game_type])) {
                         game_state = RECORD;
-                    else
+                        snprintf(timer_record[current_game_type], GAME_TYPE_NB, "%d", (int) timer);
+                    } else {
                         game_state = WIN;
+                    }
                 }
 
                 if (game[mouse_map_y][mouse_map_x] == 'X') {
