@@ -69,11 +69,9 @@ const Color hover_color = RED;
 
 float timer = 0.0f;
 char timer_text[10] = {0};
-char timer_record[GAME_TYPE_NB][10] = {
-    [BEGINNER] = "12",
-    [INTERMEDIATE] = "42",
-    [EXPERT] = "69"
-};
+char timer_record[GAME_TYPE_NB][10] = {"9999", "9999", "9999"};
+FILE *record_file_read;
+FILE *record_file_write;
 int need_to_fill = 1;
 
 #define INIT_TEXTURE(img, tex) \
@@ -279,9 +277,34 @@ void switch_mode(GameType gt)
     }
 }
 
+void load_record(void)
+{
+    for (
+        int i=0;
+        i<GAME_TYPE_NB && 
+            fgets(timer_record[i], sizeof(timer_record[i]), record_file_read);
+        i++
+    );
+}
+
+void save_record(void)
+{
+    record_file_write = fopen(RECORD_FILE, "w");
+
+    fprintf(record_file_write, "%s\n%s\n%s\n",
+            timer_record[BEGINNER],
+            timer_record[INTERMEDIATE],
+            timer_record[EXPERT]);
+
+    fclose(record_file_write);
+}
+
 int main(void)
 {
     srand(time(NULL));
+
+    record_file_read = fopen(RECORD_FILE, "r");
+    load_record();
 
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
 #ifdef RELEASE
@@ -519,7 +542,8 @@ int main(void)
                 if (game_state != LOSE && count_undiscovered_cell <= nb_bomb) {
                     if (timer < atoi(timer_record[current_game_type])) {
                         game_state = RECORD;
-                        snprintf(timer_record[current_game_type], GAME_TYPE_NB, "%d", (int) timer);
+                        snprintf(timer_record[current_game_type], sizeof(timer_record[0]), "%d", (int) timer);
+                        save_record();
                     } else {
                         game_state = WIN;
                     }
