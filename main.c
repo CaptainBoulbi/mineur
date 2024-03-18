@@ -6,6 +6,15 @@
 
 #include "raylib.h"
 
+// don't forget the / at the end of dir
+#ifdef RELEASE
+    #define RESSOURCES_DIR "/home/cptbb/opt/dev/built/data/mineur/"
+#else
+    #define RESSOURCES_DIR "/home/cptbb/dev/mineur/ressources/"
+#endif
+#define RECORD_FILE "/home/cptbb/.local/share/mineur_record"
+#define SCREEN_SHOT_NAME "minesweeper-screenshot.png"
+
 #define ARRAT(arr, type, x, y) ((arr) + (y)*(type) + (x))
 
 #define min(a, b) ((a) < (b) ? (a) : (b))
@@ -283,27 +292,27 @@ int main(void)
     SetTargetFPS(60);
 
     menu = (Rectangle){0, 0, screen_width, screen_height - screen_width};
-    tile_image_orig = LoadImage("ressources/tile.png");
-    tile_hover_image_orig = LoadImage("ressources/tile_hover.png");
-    mine_image_orig = LoadImage("ressources/mine.png");
-    mine_image_orig = LoadImage("ressources/mine.png");
-    t1_image_orig = LoadImage("ressources/1.png");
-    t2_image_orig = LoadImage("ressources/2.png");
-    t3_image_orig = LoadImage("ressources/3.png");
-    t4_image_orig = LoadImage("ressources/4.png");
-    t5_image_orig = LoadImage("ressources/5.png");
-    t6_image_orig = LoadImage("ressources/6.png");
-    t7_image_orig = LoadImage("ressources/7.png");
-    t8_image_orig = LoadImage("ressources/8.png");
+    tile_image_orig = LoadImage(RESSOURCES_DIR "tile.png");
+    tile_hover_image_orig = LoadImage(RESSOURCES_DIR "tile_hover.png");
+    mine_image_orig = LoadImage(RESSOURCES_DIR "mine.png");
+    mine_image_orig = LoadImage(RESSOURCES_DIR "mine.png");
+    t1_image_orig = LoadImage(RESSOURCES_DIR "1.png");
+    t2_image_orig = LoadImage(RESSOURCES_DIR "2.png");
+    t3_image_orig = LoadImage(RESSOURCES_DIR "3.png");
+    t4_image_orig = LoadImage(RESSOURCES_DIR "4.png");
+    t5_image_orig = LoadImage(RESSOURCES_DIR "5.png");
+    t6_image_orig = LoadImage(RESSOURCES_DIR "6.png");
+    t7_image_orig = LoadImage(RESSOURCES_DIR "7.png");
+    t8_image_orig = LoadImage(RESSOURCES_DIR "8.png");
 
-    camera_texture = LoadTexture("ressources/camera.png");
-    lose_texture = LoadTexture("ressources/lose.png");
-    win_texture = LoadTexture("ressources/win.png");
-    record_texture = LoadTexture("ressources/record.png");
-    playing_texture = LoadTexture("ressources/playing.png");
-    fixed_tile_texture = LoadTexture("ressources/fixed_tile.png");
-    double_tile_texture = LoadTexture("ressources/tile_2.png");
-    triple_tile_texture = LoadTexture("ressources/tile_3.png");
+    camera_texture = LoadTexture(RESSOURCES_DIR "camera.png");
+    lose_texture = LoadTexture(RESSOURCES_DIR "lose.png");
+    win_texture = LoadTexture(RESSOURCES_DIR "win.png");
+    record_texture = LoadTexture(RESSOURCES_DIR "record.png");
+    playing_texture = LoadTexture(RESSOURCES_DIR "playing.png");
+    fixed_tile_texture = LoadTexture(RESSOURCES_DIR "fixed_tile.png");
+    double_tile_texture = LoadTexture(RESSOURCES_DIR "tile_2.png");
+    triple_tile_texture = LoadTexture(RESSOURCES_DIR "tile_3.png");
 
     setup_game();
     screen_resize_handle();
@@ -316,7 +325,7 @@ int main(void)
                 screen_resize_handle();
 
             if (take_screenshot) {
-                TakeScreenshot("minesweeper-screenshot.png");
+                TakeScreenshot(SCREEN_SHOT_NAME);
                 take_screenshot = 0;
             }
 
