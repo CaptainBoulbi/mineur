@@ -277,6 +277,13 @@ void switch_mode(GameType gt)
     }
 }
 
+int nb_len(char *string)
+{
+    int i = 0;
+    for (; string[i] >= 48 && string[i] <= 48+10; i++);
+    return i+1;
+}
+
 void load_record(void)
 {
     for (
@@ -291,10 +298,10 @@ void save_record(void)
 {
     record_file_write = fopen(RECORD_FILE, "w");
 
-    fprintf(record_file_write, "%s\n%s\n%s\n",
-            timer_record[BEGINNER],
-            timer_record[INTERMEDIATE],
-            timer_record[EXPERT]);
+    fprintf(record_file_write, "%.*s\n%.*s\n%.*s\n",
+            nb_len(timer_record[BEGINNER]) - 1, timer_record[BEGINNER],
+            nb_len(timer_record[INTERMEDIATE]) - 1, timer_record[INTERMEDIATE],
+            nb_len(timer_record[EXPERT]) - 1, timer_record[EXPERT]);
 
     fclose(record_file_write);
 }
@@ -542,6 +549,7 @@ int main(void)
                 if (game_state != LOSE && count_undiscovered_cell <= nb_bomb) {
                     if (timer < atoi(timer_record[current_game_type])) {
                         game_state = RECORD;
+                        memset(timer_record[current_game_type], 1, sizeof(timer_record[0]));
                         snprintf(timer_record[current_game_type], sizeof(timer_record[0]), "%d", (int) timer);
                         save_record();
                     } else {
