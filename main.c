@@ -321,7 +321,10 @@ int main(void)
             }
 
             if (game_state == PLAYING) {
-                timer += GetFrameTime();
+                if (need_to_fill)
+                    timer = 0;
+                else
+                    timer += GetFrameTime();
                 snprintf(timer_text, sizeof(timer_text), "%d", (int) timer);
             }
 
