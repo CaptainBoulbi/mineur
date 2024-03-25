@@ -1,5 +1,7 @@
 # MINEUR
 
+![screenshot](minesweeper-screenshot.png)
+
 Minesweeper game.
 
 Oh no, my os doesn't comme with minesweeper preinstalled, let's make it myself.
